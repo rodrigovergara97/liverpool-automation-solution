@@ -1,0 +1,10 @@
+{
+  "theme": "DARK",
+  "encoding": "utf-8",
+  "protocol": "HTTPS",
+  "timelineEnabled": true,
+  "offlineMode": false,
+  "documentTitle": "Reporte de Regresion",
+  "reportName": "Liverpool Regression Suite",
+  "timeStampFormat": "MMM dd, yyyy HH:mm:ss a"
+}

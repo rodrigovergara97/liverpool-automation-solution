@@ -1,0 +1,58 @@
+{
+  "id": "USR-94821",
+  "isActive": true,
+  "profile": {
+    "firstName": "Alex",
+    "lastName": "Rivera",
+    "contacts": {
+      "email": "alex.rivera@example.com",
+      "phones": [
+        { "type": "mobile", "number": "555-010-9988" },
+        { "type": "work", "number": "555-010-4422" }
+      ],
+      "address": {
+        "street": "742 Evergreen Terrace",
+        "city": "Springfield",
+        "zipCode": 62704,
+        "coordinates": { "lat": 39.7817, "lng": -89.6501 }
+      }
+    }
+  },
+  "roles": ["admin", "editor", "moderator"],
+  "projects": [
+    {
+      "projectId": "PRJ-001",
+      "title": "Quantum Ledger",
+      "status": "completed",
+      "team": [
+        { "name": "Sam", "id": "A1" },
+        { "name": "Casey", "id": "A2" }
+      ],
+      "metrics": {
+        "budget": 50000.50,
+        "completionRate": 1.0,
+        "logs": null
+      }
+    },
+    {
+      "projectId": "PRJ-002",
+      "title": "Aura AI",
+      "status": "ongoing",
+      "team": [{ "name": "Riley", "id": "B1" }],
+      "metrics": {
+        "budget": 120000.00,
+        "completionRate": 0.45
+      }
+    }
+  ],
+  "metadata": {
+    "lastLogin": "2026-05-24T18:30:00Z",
+    "preferences": {
+      "theme": "dark",
+      "notifications": {
+        "email": true,
+        "sms": false
+      }
+    }
+  }
+}

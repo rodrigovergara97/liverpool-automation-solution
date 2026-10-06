@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org">
+<suite name="ProgressionSuite" parallel="classes" thread-count="2">
+    <test name="FunctionalTests">
+        <classes>
+            <class name="tests.BaseTest" />
+            <class name="tests.ApiTest" />
+        </classes>
+    </test>
+</suite>
