@@ -1,7 +1,7 @@
 {
   "theme": "DARK",
   "encoding": "utf-8",
-  "protocol": "HTTPS",
+  "protocol": "https",
   "timelineEnabled": true,
   "offlineMode": false,
   "documentTitle": "Reporte de Regresion",

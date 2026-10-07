@@ -2,84 +2,224 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
+public class HomePage extends BasePage {
 
-public class HomePage extends BasePage{
+    // ============================================================
+    // HEADER
+    // ============================================================
 
-    private final By categoriesButton = By.cssSelector("button[data-testid$='header-button-category']");
-    private final By headerMenuCategories = By.xpath("//div[contains(@data-testid,'header-menu-categories') and @role='dialog']//*[contains(@data-testid,'logo-side-menu')]");
-    private final By mainPageHeader = By.cssSelector("[data-testid$='header']");
-    private final By loginButton = By.cssSelector("button[data-testid$='header-menu-dropdown-button']");
+    private final By categoriesButton =
+            By.cssSelector(
+                    "button[data-testid$='header-button-category']"
+            );
 
-    private String categoryItem = "//div[contains(@data-testid,'header-menu-categories') and @role='dialog']//span[contains(@data-testid,'header-menu-categories-menu-category-item--label') and contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '%s')]";
-    private final String URL = "https://www.liverpool.com.mx/tienda/home";
+    private final By headerMenuCategories =
+            By.xpath(
+                    "//div[contains(@data-testid,'header-menu-categories') " +
+                            "and @role='dialog']" +
+                            "//*[contains(@data-testid,'logo-side-menu')]"
+            );
+
+    private final By mainPageHeader =
+            By.cssSelector("[data-testid$='header']");
+
+    // ============================================================
+    // LOGIN
+    // ============================================================
+
+    private final By loginButton =
+            By.cssSelector(
+                    "button[data-testid$='header-menu-dropdown-button']"
+            );
+
+    private final By profileButtonText =
+            By.xpath(
+                    "(//button[contains(@data-testid," +
+                            "'header-menu-dropdown-button')]//span)[1]"
+            );
+
+    // ============================================================
+    // CATEGORY MENU
+    // ============================================================
+
+    private final String categoryItem =
+            "//div[contains(@data-testid,'header-menu-categories') " +
+                    "and @role='dialog']" +
+                    "//span[contains(@data-testid," +
+                    "'header-menu-categories-menu-category-item--label') " +
+                    "and contains(translate(text(), " +
+                    "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', " +
+                    "'abcdefghijklmnopqrstuvwxyz'), '%s')]";
+
+    private static final String URL =
+            "https://www.liverpool.com.mx/tienda/home";
 
     public HomePage(WebDriver driver) {
         super(driver);
     }
 
-    public void clickCategoriesButton(){
+    // ============================================================
+    // HEADER / CATEGORIES
+    // ============================================================
+
+    /**
+     * Opens the categories menu.
+     */
+    public void clickCategoriesButton() {
         robustClick(categoriesButton);
     }
 
-    public void clickLoginButton(){
-        robustClick(loginButton);
+    /**
+     * Checks whether the categories menu is visible.
+     *
+     * @return true when the categories menu is displayed
+     */
+    public boolean isCategoriesMenuDisplayed() {
+        return isElementDisplayed(headerMenuCategories);
     }
 
-    public CategoryPage clickCategory(String category){
-        if(isCategoriesMenuDisplayed()) {
-            String finalCategoryLocator = String.format(categoryItem, category);
-            System.out.println("category to navigate:" + finalCategoryLocator);
-            robustClick(By.xpath(finalCategoryLocator));
-            CategoryPage categoryPage = new CategoryPage(driver);
-            return categoryPage;
-        }
-        return null;
-    }
+    /**
+     * Waits for the categories menu to be present in the DOM.
+     *
+     * @return true when the menu is present
+     */
+    public boolean isCategoriesMenuPresent() {
 
-    public boolean isCategoriesMenuDisplayed(){
-       return isElementDisplayed(headerMenuCategories);
-    }
-
-    public boolean isCategoriesMenuPresent(){
         try {
-            wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.presenceOfElementLocated(headerMenuCategories));
+            waitForElementToBePresent(
+                    headerMenuCategories,
+                    10
+            );
+
             return true;
-        }
-        catch (Exception e){
-            e.printStackTrace();
+
+        } catch (Exception e) {
             return false;
         }
-
     }
 
-    public boolean isMainHeaderDisplayed(){
-        return isElementDisplayed(mainPageHeader);
+    /**
+     * Selects a category from the categories menu.
+     *
+     * @param category category name
+     * @return CategoryPage representing the selected category
+     */
+    public CategoryPage clickCategory(String category) {
+
+        if (!isCategoriesMenuDisplayed()) {
+            return null;
+        }
+
+        String categoryLocator =
+                String.format(categoryItem, category);
+
+        robustClick(By.xpath(categoryLocator));
+
+        return new CategoryPage(driver);
     }
 
-    public void navigateTo(){
-        driver.get(URL);
-    }
-
-    public void navigateToCategory(String category){
+    /**
+     * Opens the category menu and navigates to the requested category.
+     *
+     * @param category category to select
+     */
+    public void navigateToCategory(String category) {
         clickCategoriesButton();
         clickCategory(category);
     }
 
-    public String getCurrentBagQuantity(){
-       return super.getCurrentBagQuantity();
+    /**
+     * Checks whether the main header is displayed.
+     *
+     * @return true when the header is visible
+     */
+    public boolean isMainHeaderDisplayed() {
+        return isElementDisplayed(mainPageHeader);
     }
 
-    public void clickBag(){
-         super.clickToBag();
+    // ============================================================
+    // LOGIN
+    // ============================================================
+
+    /**
+     * Opens the login menu.
+     */
+    public void clickLoginButton() {
+        robustClick(loginButton);
     }
 
+    /**
+     * Checks whether the user is logged in.
+     *
+     * @return true when the profile does not display "iniciar"
+     */
+    public boolean isLoginSuccessful() {
 
+        waitForElementToBePresent(
+                loginButton,
+                2
+        );
 
+        String currentLogin =
+                getTextFromElement(
+                        driver.findElement(profileButtonText)
+                );
 
+        return !currentLogin
+                .trim()
+                .toLowerCase()
+                .contains("iniciar");
+    }
+
+    // ============================================================
+    // NAVIGATION
+    // ============================================================
+
+    /**
+     * Navigates to the Liverpool home page.
+     */
+    public void navigateTo() {
+        driver.get(URL);
+    }
+
+    // ============================================================
+    // SHOPPING BAG
+    // ============================================================
+
+    /**
+     * Returns the current shopping bag quantity.
+     *
+     * @return current bag quantity
+     */
+    public int getCurrentBagQuantity() {
+        return getBagQuantity();
+    }
+
+    /**
+     * Waits until the shopping bag quantity changes.
+     * <p>
+     * This should be used after adding a product to the bag.
+     *
+     * @param previousQuantity quantity before adding the product
+     */
+    public void waitForBagQuantityChange(int previousQuantity) {
+        super.waitForBagQuantityChange(previousQuantity);
+    }
+
+    /**
+     * Waits until the shopping bag reaches an exact quantity.
+     *
+     * @param expectedQuantity expected bag quantity
+     */
+    public void waitForBagQuantity(int expectedQuantity) {
+        super.waitForBagQuantity(expectedQuantity);
+    }
+
+    /**
+     * Opens the shopping bag.
+     */
+    public void clickBag() {
+        clickToBag();
+    }
 }

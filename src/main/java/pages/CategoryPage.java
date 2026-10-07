@@ -5,143 +5,299 @@ import org.openqa.selenium.*;
 import java.lang.ref.PhantomReference;
 import java.util.List;
 
-public class CategoryPage extends BasePage{
+public class CategoryPage extends BasePage {
 
-    private final By categoriesContainer = By.cssSelector("div[@data-testid$='filter-level-nav-slots']");
-    private final By levelNavCategory = By.xpath("(//div[contains(@data-testid,'filter-level-nav-category-title-category-title-CAT')])[1]");
-    private final By seeAllLink = By.cssSelector("a[@data-testid$='clp-page-link']");
-    private final By currentPageInput = By.cssSelector("input[data-testid$='page-pagination-input']");
-    private final By productList = By.cssSelector("div[id$='page-card-product-list']");
-    private final By cardProduct = By.cssSelector("div[id$='page-card-product-list'] a[data-testid$='card-card-link']");
+    // Locators
+    private final By levelNavCategory = By.xpath(
+            "(//div[contains(@data-testid,'filter-level-nav-category-title-category-title-CAT')])[1]"
+    );
 
-    private String categoryItem = "(//*[contains(@data-testid,'filter-level-nav-slots')]/a[contains(@data-testid,'filter-level-nav-slot') and contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '%s')])[1]";
-    private String filterCategory ="//button[@data-testid='button-dropdown-filter']/span[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'%s')]";
-    private String filterCategoryCheckBox ="(//button[@data-testid='button-dropdown-filter']/span[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'%s')]/ancestor::div[@class='border-b']//div[contains(@data-testid,'checkbox-group')]//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'%s')])[1]";
+    private final By seeAllLink = By.cssSelector(
+            "a[data-testid$='clp-page-link']"
+    );
 
-    private String searchBar = "//input[contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'%s')]";
-    private String brandFilterApplied ="button[data-testid$='%s']";
+    private final By currentPageInput = By.cssSelector(
+            "input[data-testid$='page-pagination-input']"
+    );
+
+    private final By productList = By.cssSelector(
+            "div[id$='page-card-product-list']"
+    );
+
+    private final By cardProduct = By.cssSelector(
+            "div[id$='page-card-product-list'] a[data-testid$='card-card-link']"
+    );
+
+    // Dynamic locators
+    private final String categoryItem = """
+            (//*[contains(@data-testid,'filter-level-nav-slots')]
+            /a[contains(@data-testid,'filter-level-nav-slot')
+            and contains(translate(text(),
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            'abcdefghijklmnopqrstuvwxyz'), '%s')])[1]
+            """;
+
+    private final String filterCategory = """
+            //button[@data-testid='button-dropdown-filter']
+            /span[contains(translate(text(),
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            'abcdefghijklmnopqrstuvwxyz'),'%s')]
+            """;
+
+    private final String filterCategoryCheckBox = """
+            (//button[@data-testid='button-dropdown-filter']
+            /span[contains(translate(text(),
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            'abcdefghijklmnopqrstuvwxyz'),'%s')]
+            /ancestor::div[@class='border-b']
+            //div[contains(@data-testid,'checkbox-group')]
+            //*[contains(translate(text(),
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            'abcdefghijklmnopqrstuvwxyz'),'%s')])[1]
+            """;
+
+    private final String searchBar = """
+            //input[contains(translate(@placeholder,
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            'abcdefghijklmnopqrstuvwxyz'),'%s')]
+            """;
+
+    private final String brandFilterApplied =
+            "button[data-testid$='%s']";
 
 
     public CategoryPage(WebDriver driver) {
         super(driver);
     }
 
-    public void clickCategory(String category){
-        String finalCategoryXpath = String.format(categoryItem,category);
-        robustClick(By.xpath(finalCategoryXpath));
+    /**
+     * Selects a category from the category navigation.
+     *
+     * @param category category name to select
+     */
+    public void clickCategory(String category) {
+        robustClick(By.xpath(String.format(categoryItem, category)));
     }
 
-    public void clickSeeAll(){
+    /**
+     * Clicks the "See All" link.
+     */
+    public void clickSeeAll() {
         robustClick(seeAllLink);
     }
 
-    public boolean isProductListDisplayed(){
+    /**
+     * Checks whether the product list is displayed.
+     *
+     * @return true if the product list is visible
+     */
+    public boolean isProductListDisplayed() {
         return isElementDisplayed(productList);
     }
 
-    public boolean isFilterDisplayed(String filter){
-
-        return isElementDisplayed(By.xpath(String.format(filterCategory,filter)));
+    /**
+     * Checks whether a specific filter is displayed.
+     *
+     * @param filter filter name
+     * @return true if the filter is visible
+     */
+    public boolean isFilterDisplayed(String filter) {
+        return isElementDisplayed(
+                By.xpath(String.format(filterCategory, filter))
+        );
     }
 
-
-
-    public String getRootLevelCategory(){
-        waitForElementToBePresent(levelNavCategory,2);
-        WebElement element = driver.findElement(levelNavCategory);
-        return getTextFromElement(element);
+    /**
+     * Returns the current root-level category name.
+     *
+     * @return root-level category name
+     */
+    public String getRootLevelCategory() {
+        waitForElementToBePresent(levelNavCategory, 2);
+        return getTextFromElement(driver.findElement(levelNavCategory));
     }
 
-    public void selectItemByNumberInPage(int index){
-        if(isProductListDisplayed()){
-            List<WebElement> products = driver.findElements(cardProduct);
+    /**
+     * Selects a product from the current page by its zero-based index.
+     *
+     * @param index product index
+     */
+    public void selectItemByNumberInPage(int index) {
+        if (!isProductListDisplayed()) {
+            return;
+        }
+
+        List<WebElement> products = driver.findElements(cardProduct);
+
+        if (index >= 0 && index < products.size()) {
             robustClick(products.get(index));
         }
     }
 
-    public void selectCategoryFilter(String filter,String value){
-        if(isFilterDisplayed(filter)){
+    /**
+     * Selects a value from a category filter.
+     *
+     * The method retries a limited number of times in case the DOM
+     * changes and causes a stale element reference.
+     *
+     * @param filter filter name
+     * @param value value to select
+     */
+    public void selectCategoryFilter(String filter, String value) {
+        if (!isFilterDisplayed(filter)) {
+            return;
+        }
+
+        By checkboxLocator = By.xpath(
+                String.format(filterCategoryCheckBox, filter, value)
+        );
+
+        for (int attempt = 0; attempt < 3; attempt++) {
             try {
-                String parentString = "/parent::*";
-                WebElement filterElement = driver.findElement(By.xpath(String.format(filterCategory,filter)));
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", filterElement);;
+                WebElement filterElement = driver.findElement(
+                        By.xpath(String.format(filterCategory, filter))
+                );
 
-                WebElement checkBox = driver.findElement(By.xpath(String.format(filterCategoryCheckBox,filter,value)));
-                System.out.println("checkbox value"+String.format(filterCategoryCheckBox,filter,value));
-                WebElement checkBoxFinal = driver.findElement(By.xpath(generateResultInputStringForCategory(filter,String.format(filterCategoryCheckBox,filter,value))));
-                //checkBox.click();
-                System.out.println("checkbox color:"+checkBoxFinal.getCssValue("color"));
-                if (!checkBoxFinal.getCssValue("color").contains("rgba(225, 0, 152, 1)")){
-                    checkBox = driver.findElement(By.xpath(String.format(filterCategoryCheckBox,filter,value)));
-                    checkBox.click();
-                    selectCategoryFilter( filter, value);
+                scrollToElement(filterElement);
+
+                WebElement checkbox = driver.findElement(checkboxLocator);
+
+                String inputLocator =
+                        generateResultInputStringForCategory(
+                                filter,
+                                checkboxLocator.toString().replace("By.xpath: ", "")
+                        );
+
+                WebElement checkboxInput =
+                        driver.findElement(By.xpath(inputLocator));
+
+                if (!isCheckboxSelected(checkboxInput)) {
+                    robustClick(checkbox);
                 }
+
+                return;
+
+            } catch (StaleElementReferenceException | NoSuchElementException e) {
+                // Retry because the filter DOM may have been refreshed.
             }
-            catch (StaleElementReferenceException | NoSuchElementException e){
-                selectCategoryFilter(filter,value);
-            }
-
         }
     }
 
-    public String generateResultInputStringForCategory(String category,String xpath){
-        String parentString = "/parent::*";
-        String finalString = "";
-        String suffix ="//input/parent::span";
+    /**
+     * Builds the XPath used to locate the checkbox input associated
+     * with a category filter.
+     *
+     * @param category filter category
+     * @param xpath base checkbox XPath
+     * @return XPath for the checkbox input
+     */
+    public String generateResultInputStringForCategory(
+            String category,
+            String xpath) {
 
-        if (category.toLowerCase().contains("color")){
-            finalString += xpath + parentString.repeat(2)+suffix;
-        }
-        else {
-            finalString += xpath + parentString.repeat(3)+suffix;
-        }
+        String suffix = "//input/parent::span";
 
-        return finalString;
+        int parentLevels = category.toLowerCase().contains("color") ? 2 : 3;
+
+        return xpath + "/parent::*".repeat(parentLevels) + suffix;
     }
 
-    public void navigateToPage (String page){
-        if(!page.equals(getCurrentProductsPage())){
-            waitForElementToBePresent(currentPageInput,3);
-            WebElement currentPage = driver.findElement(currentPageInput);
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'center'});", currentPage);
-            actions.click(currentPage)
-                    .keyDown(Keys.CONTROL)
-                    .sendKeys("a")
-                    .keyUp(Keys.CONTROL)
-                    .sendKeys(Keys.DELETE)
-                    .sendKeys(page)
-                    .build()
-                    .perform();
-
+    /**
+     * Navigates to the requested product page.
+     *
+     * @param page page number
+     */
+    public void navigateToPage(String page) {
+        if (page.equals(getCurrentProductsPage())) {
+            return;
         }
-    }
 
+        waitForElementToBePresent(currentPageInput, 3);
 
-    public String getCurrentProductsPage(){
-        waitForElementToBePresent(currentPageInput,2);
         WebElement currentPage = driver.findElement(currentPageInput);
-        return currentPage.getAttribute("value");
+        scrollToElement(currentPage);
+
+        actions.click(currentPage)
+                .keyDown(Keys.CONTROL)
+                .sendKeys("a")
+                .keyUp(Keys.CONTROL)
+                .sendKeys(page)
+                .sendKeys(Keys.ENTER)
+                .build()
+                .perform();
     }
 
-    public void filterByBrand(String brand){
-        String brandSearchBar = String.format(searchBar,"buscar marca");
-        waitForElementToBePresent(By.xpath(brandSearchBar),3);
-        WebElement searchBar = driver.findElement(By.xpath(brandSearchBar));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'center'});", searchBar);
-        sendKeysWithAction(searchBar,brand);
-        try {
-            WebElement checkBox = driver.findElement(By.xpath(String.format(filterCategoryCheckBox,"marcas",brand)));
-            String brandText = getTextFromElement(checkBox);
-            actions.moveToElement(checkBox).click().build().perform();
-            waitForElementToBePresent(By.cssSelector(String.format(brandFilterApplied,brandText)),1);
-        }
-        catch (NoSuchElementException | TimeoutException e){
-            filterByBrand(brand);
-        }
-
+    /**
+     * Returns the current product page number.
+     *
+     * @return current page number
+     */
+    public String getCurrentProductsPage() {
+        waitForElementToBePresent(currentPageInput, 2);
+        return driver.findElement(currentPageInput).getAttribute("value");
     }
 
+    /**
+     * Filters products by brand using the brand search field.
+     *
+     * @param brand brand name
+     */
+    public void filterByBrand(String brand) {
+        String brandSearchBar = String.format(searchBar, "buscar marca");
+        By searchBarLocator = By.xpath(brandSearchBar);
 
+        waitForElementToBePresent(searchBarLocator, 3);
 
+        WebElement searchInput = driver.findElement(searchBarLocator);
+        scrollToElement(searchInput);
+        sendKeysWithAction(searchInput, brand);
 
+        for (int attempt = 0; attempt < 3; attempt++) {
+            try {
+                By checkboxLocator = By.xpath(
+                        String.format(filterCategoryCheckBox, "marcas", brand)
+                );
+
+                WebElement checkbox = driver.findElement(checkboxLocator);
+                String brandText = getTextFromElement(checkbox);
+
+                robustClick(checkbox);
+
+                waitForElementToBePresent(
+                        By.cssSelector(String.format(brandFilterApplied, brandText)),
+                        1
+                );
+
+                return;
+
+            } catch (NoSuchElementException | TimeoutException |
+                     StaleElementReferenceException e) {
+                // Retry because the filter may still be loading.
+            }
+        }
+    }
+
+    /**
+     * Scrolls an element to the center of the viewport.
+     *
+     * @param element element to scroll to
+     */
+    private void scrollToElement(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center', inline: 'center'});",
+                element
+        );
+    }
+
+    /**
+     * Checks whether a checkbox is already selected.
+     *
+     * @param checkbox checkbox element
+     * @return true if the checkbox is selected
+     */
+    private boolean isCheckboxSelected(WebElement checkbox) {
+        return checkbox.getCssValue("color")
+                .contains("rgba(225, 0, 152, 1)");
+    }
 }
+

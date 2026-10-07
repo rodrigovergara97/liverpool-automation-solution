@@ -1,149 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="
+            http://maven.apache.org/POM/4.0.0
+            https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>liverpoo-automation</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <!-- Project information -->
+    <groupId>mx.com.liverpool</groupId>
+    <artifactId>liverpool-automation</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <name>Liverpool UI Automation Framework</name>
+    <description>
+        UI automation framework for Liverpool Mexico using
+        Java, Selenium WebDriver, TestNG and ExtentReports.
+    </description>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <package.directory>${project.build.directory}/docker-resources</package.directory>
-    </properties>
 
+        <!-- Java -->
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Dependencies -->
+        <selenium.version>4.44.0</selenium.version>
+        <testng.version>7.10.2</testng.version>
+        <extentreports.version>5.1.2</extentreports.version>
+        <webdrivermanager.version>6.3.4</webdrivermanager.version>
+        <json.version>20250517</json.version>
+
+        <!-- Maven plugins -->
+        <maven.compiler.version>3.15.0</maven.compiler.version>
+        <maven.surefire.version>3.5.5</maven.surefire.version>
+
+        <!-- Execution -->
+        <browser>chrome</browser>
+        <environment>qa</environment>
+        <headless>false</headless>
+
+    </properties>
     <dependencies>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20250517</version>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.10.2</version>
+            <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- Source: https://mvnrepository.com/artifact/com.aventstack/extentreports -->
         <dependency>
             <groupId>com.aventstack</groupId>
             <artifactId>extentreports</artifactId>
-            <version>5.1.2</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Source: https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>4.44.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Source: https://mvnrepository.com/artifact/io.cucumber/cucumber-java -->
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-java</artifactId>
-            <version>7.34.4</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- cucumber testng depdency -->
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-testng</artifactId>
-            <version>7.33.0</version>
-            <scope>compile</scope>
+            <version>${extentreports.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>6.3.4</version>
+            <version>${webdrivermanager.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
         </dependency>
 
-
     </dependencies>
-
     <build>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.15.0</version>
+                <version>${maven.compiler.version}</version>
+
                 <configuration>
-                    <release>17</release>
+                    <release>${maven.compiler.release}</release>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.5</version>
+                <version>${maven.surefire.version}</version>
+
                 <configuration>
+
+                    <!-- TestNG suite -->
                     <suiteXmlFiles>
-                        <suiteXmlFile>testng.xml</suiteXmlFile>
+                        <suiteXmlFile>
+                            ${project.basedir}/testng.xml
+                        </suiteXmlFile>
                     </suiteXmlFiles>
+
+                    <!-- System properties -->
+                    <systemPropertyVariables>
+
+                        <browser>${browser}</browser>
+
+                        <environment>
+                            ${environment}
+                        </environment>
+
+                        <headless>${headless}</headless>
+
+                    </systemPropertyVariables>
+
+                    <!-- Encoding -->
+                    <argLine>
+                        -Dfile.encoding=UTF-8
+                    </argLine>
+
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.11.0</version> <!-- Use the latest version from Maven Central -->
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${package.directory}/libs</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
-                <configuration>
-                    <outputDirectory>${package.directory}</outputDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <!-- Automatically binds to the package phase -->
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution>
-                        <id>copy-test-resources-custom</id>
-                        <!-- Bind to a lifecycle phase before or during testing -->
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <!-- Define your custom target directory here -->
-                            <outputDirectory>${project.build.directory}/custom-test-output</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <!-- Source path to your test resources -->
-                                    <directory>src/test/resources</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
 

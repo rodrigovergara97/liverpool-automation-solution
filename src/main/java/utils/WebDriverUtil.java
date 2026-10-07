@@ -44,7 +44,10 @@ public class WebDriverUtil {
         wait = new WebDriverWait(this.driver,Duration.ofSeconds(seconds));
         wait.until(ExpectedConditions.visibilityOf(element));
     }
-
+    protected void waitForElementToBeVisible(By element, long seconds){
+        wait = new WebDriverWait(this.driver,Duration.ofSeconds(seconds));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(element));
+    }
     protected void waitForElementToBeClickable(WebElement element, long seconds){
         wait = new WebDriverWait(this.driver,Duration.ofSeconds(seconds));
         wait.until(ExpectedConditions.elementToBeClickable(element));
