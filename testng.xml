@@ -12,7 +12,7 @@
     <test name="Liverpool Regression Tests">
 
         <classes>
-            <class name="tests.ApiTest"/>
+            <class name="tests.PurchaseTest"/>
         </classes>
 
     </test>

@@ -171,8 +171,6 @@ public class ProductPage extends BasePage {
 
         selectFirstOptionOfUndefinedMandatory();
 
-        robustClick(addToBagButton);
-
         if (isErrorMessageDisplayed()) {
             addProductToBag(true);
         }
@@ -391,5 +389,13 @@ public class ProductPage extends BasePage {
         );
 
     }
+
+    public void setProductQuantity(int quantity){
+        if(isElementDisplayed(currentProductQuantity)){
+            WebElement productQuantityInput = driver.findElement(currentProductQuantity);
+            productQuantityInput.sendKeys(String.valueOf(quantity));
+        }
+    }
+
 }
 

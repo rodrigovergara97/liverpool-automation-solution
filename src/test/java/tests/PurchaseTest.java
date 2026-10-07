@@ -11,7 +11,7 @@ import org.testng.asserts.Assertion;
 import pages.*;
 import utils.DriverManager;
 
-public class ApiTest extends BaseTest {
+public class PurchaseTest extends BaseTest {
 
     @BeforeClass
     public void setUp() {
@@ -407,6 +407,44 @@ public class ApiTest extends BaseTest {
 
         Assert.assertEquals(originalItemPrice, buyNowPage.getOriginalItemPrice(), "Product's price doesnt remain the same after refresh");
         Assert.assertEquals(getCurrentProductQuantity, buyNowPage.getCurrentProductQuantity(), "Product's quantity doesnt remain  the same after refresh");
+
+    }
+
+    @Test(description = "Flujo agregar cantidad mayor al producto dispobile",groups = {"edge","regression"},
+            testName = "prueba negativa producto sin todos detalles mandatorios incluidos",dependsOnMethods = {"login"})
+    public void addMoreThanMaximumAvaialbleFromProduct() throws InterruptedException {
+
+        homePage.clickCategoriesButton();
+
+        Assert.assertTrue(
+                homePage.isCategoriesMenuPresent(),
+                "Categories menu is not displayed"
+        );
+
+        homePage.clickCategory("hombre");
+
+        Assert.assertEquals(
+                categoryPage.getRootLevelCategory(),
+                "Hombre",
+                "Root category is incorrect"
+        );
+
+        homePage.clickCategoriesButton();
+
+        homePage.clickCategory("electr");
+
+        categoryPage.clickCategory("computa");
+        categoryPage.clickCategory("computadoras");
+
+        categoryPage.filterByBrand("lenovo");
+
+        categoryPage.selectItemByNumberInPage(4);
+
+
+        // Add product
+        productPage.setProductQuantity(100);
+        productPage.addProductToBag(false);
+        Assert.assertFalse(productPage.isSuccessMessageDisplayed());
 
     }
 
