@@ -1,599 +1,1359 @@
-Liverpool UI Automation Framework
 
+ # Liverpool UI Automation Framework
 
+ Framework de automatización UI desarrollado para validar flujos críticos de compra del sitio web de **Liverpool México**, utilizando **Java, Selenium WebDriver, TestNG, Maven, Page Object Model y ExtentReports**.
 
+ La automatización se enfoca en los escenarios funcionales y de regresión de mayor prioridad relacionados con:
 
+ - Autenticación.
+- Navegación por categorías.
+- Selección y configuración de productos.
+- Agregado de productos a la bolsa.
+- Validación del contador de la bolsa.
+- Compra de productos.
+- Validaciones negativas.
+- Validaciones de cantidades máximas.
+- Persistencia de información durante un refresh.
 
+---
 
+ ## Aplicación bajo prueba
 
+ **Liverpool México**
 
-Framework de automatización UI desarrollado para validar los principales flujos de compra del sitio web de Liverpool México utilizando Selenium WebDriver, Java, TestNG y Page Object Model.
+ https://www.liverpool.com.mx/tienda/home
 
-El proyecto cubre navegación por categorías, selección y configuración de productos, incorporación a la bolsa y flujo de "Comprar ahora".
+ La automatización utiliza el sitio de Liverpool México como aplicación bajo prueba.
 
-📌 Aplicación bajo prueba
+---
 
-Liverpool México
+ ## Objetivo
 
-https://www.liverpool.com.mx/tienda/home
+ El objetivo del framework es validar los principales escenarios críticos del flujo de compra mediante pruebas automatizadas de UI.
 
-La imagen corresponde a una captura del sitio utilizada durante la ejecución de las pruebas.
+ El flujo general es:
 
-🎯 Objetivo
+```
+                    ┌──────────────┐
+                    │    LOGIN     │
+                    └──────┬───────┘
+                           │
+                           ▼
+                  ┌─────────────────┐
+                  │   CATEGORÍAS    │
+                  └────────┬────────┘
+                           │
+                           ▼
+                  ┌─────────────────┐
+                  │ FILTROS /       │
+                  │ PRODUCTOS       │
+                  └────────┬────────┘
+                           │
+                           ▼
+                  ┌─────────────────┐
+                  │ CONFIGURACIÓN   │
+                  │ DEL PRODUCTO    │
+                  └────────┬────────┘
+                           │
+                           ▼
+                  ┌─────────────────┐
+                  │ AGREGAR A BOLSA │
+                  └────────┬────────┘
+                           │
+                           ▼
+                  ┌─────────────────┐
+                  │ VALIDAR BOLSA   │
+                  └────────┬────────┘
+                           │
+                           ▼
+                  ┌─────────────────┐
+                  │   COMPRAR AHORA │
+                  └─────────────────┘
+```
 
-El objetivo de la automatización es certificar los flujos críticos de comercio electrónico:
+---
 
-Login
-   ↓
-Menú de categorías
-   ↓
-Selección de categoría
-   ↓
-Filtros
-   ↓
-Selección de producto
-   ↓
-Configuración del producto
-   ↓
-Agregar a bolsa
-   ↓
-Validación del contador
-   ↓
-Comprar ahora
+ ## Tecnologías
 
-🛠️ Tecnologías
-Tecnología	Versión	Uso
-☕ Java	17	Lenguaje principal
-🧪 Selenium	4.44.0	Automatización UI
-🧪 TestNG	7.10.2	Ejecución y organización de pruebas
-📦 Maven	3.8+	Gestión del proyecto
-📊 ExtentReports	5.1.2	Reportes HTML
-🌐 Chrome	Actual	Navegador principal
-⚙️ WebDriverManager	6.3.4	Gestión del driver
-📄 JSON	20250517	Configuración
-🏗️ Arquitectura
+ | Tecnología | Versión | Uso |
+| --- | --- | --- |
+| Java | 17 | Lenguaje principal |
+| Selenium WebDriver | 4.44.0 | Automatización UI |
+| TestNG | 7.10.2 | Ejecución y organización de pruebas |
+| Maven | 3.8+ | Gestión y ejecución del proyecto |
+| ExtentReports | 5.1.2 | Reportes HTML |
+| WebDriverManager | 6.3.4 | Gestión de WebDriver |
+| JSON | 20250517 | Configuración |
+| Chrome | Actual | Navegador principal |
 
-El framework utiliza Page Object Model (POM) para separar las acciones de la aplicación de los casos de prueba.
+---
 
-                    ┌─────────────────────┐
-                    │       TestNG        │
-                    │     Test Cases      │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │      Page Objects   │
-                    ├─────────────────────┤
-                    │ HomePage            │
-                    │ LoginPage           │
-                    │ CategoryPage        │
-                    │ ProductPage         │
-                    │ BuyNowPage          │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │      BasePage       │
-                    │ Common Selenium     │
-                    │ functionality       │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │   WebDriverUtil     │
-                    │ Selenium utilities  │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │   Liverpool Web     │
-                    └─────────────────────┘
+ ## Arquitectura
 
+ El framework utiliza **Page Object Model (POM)** para separar la lógica de interacción con la aplicación de los casos de prueba.
 
-🧪 Casos de prueba
+```
+                           ┌─────────────────────┐
+                           │       TestNG        │
+                           │     Test Cases      │
+                           └──────────┬──────────┘
+                                      │
+                                      ▼
+                           ┌─────────────────────┐
+                           │    PurchaseTest     │
+                           └──────────┬──────────┘
+                                      │
+                                      ▼
+             ┌───────────────────────────────────────────┐
+             │                Page Objects                │
+             ├───────────────────────────────────────────┤
+             │ HomePage                                  │
+             │ LoginPage                                 │
+             │ CategoryPage                              │
+             │ ProductPage                               │
+             │ BuyNowPage                                │
+             └──────────────────────┬────────────────────┘
+                                    │
+                                    ▼
+                           ┌─────────────────────┐
+                           │      BasePage       │
+                           │ Selenium utilities  │
+                           └──────────┬──────────┘
+                                      │
+                                      ▼
+                           ┌─────────────────────┐
+                           │    DriverManager    │
+                           │    WebDriver        │
+                           └──────────┬──────────┘
+                                      │
+                                      ▼
+                           ┌─────────────────────┐
+                           │ Liverpool México    │
+                           └─────────────────────┘
+```
 
-Los casos están organizados en tres grupos:
+---
 
-🟢 Positive
+ # Casos automatizados
 
-🔴 Negative
+ Los casos implementados actualmente en `PurchaseTest` se dividen en:
 
-🟡 Edge
+ - **Functional / Regression**
+- **Negative / Regression**
+- **Edge / Regression**
 
-La prioridad se concentra en los escenarios que representan mayor riesgo para el flujo de compra.
+ La cobertura se concentra en los escenarios de mayor prioridad del flujo de compra.
 
-🟢 Casos positivos
-POS-001 — Login exitoso
+---
 
-Prioridad: P0
+ # 1\. Login exitoso
 
-Objetivo: validar que un usuario pueda iniciar sesión correctamente.
+ ### ID
 
-Flujo:
+ `TC-001`
 
-Home
- ↓
-Login
- ↓
-Autenticación
- ↓
-Usuario autenticado
+ ### Tipo
 
+ Functional / Regression
 
-Validación:
+ ### Prioridad
 
-El header debe mostrar correctamente el estado autenticado.
+ P0
 
+ ### Descripción
+
+ Valida que un usuario pueda iniciar sesión correctamente.
+
+ ### Flujo
+
+```
+┌──────────────┐
+│ Home Liverpool│
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Login        │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Autenticación│
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Usuario      │
+│ autenticado  │
+└──────────────┘
+```
+
+ ### Validación
+
+ Se valida que el usuario haya iniciado sesión correctamente.
+
+```
+Assert.assertTrue(
+    homePage.isLoginSuccessful(),
+    "Login was not successful"
+);
+```
+
+ ### TestNG
+
+```
 @Test(
-    description = "Login exitoso",
-    groups = {"positive", "smoke", "regression"}
+    description = "login exitoso",
+    groups = {"functional", "regression"},
+    testName = "login exitoso"
 )
-public void loginSuccessful() {
+public void login() {
     // Test
 }
-
-POS-002 — Navegación por categorías
-
-Prioridad: P0
-
-Validar navegación hacia:
-
-👞 Hombre → Zapatos → Botas
-
-👞 Hombre → Zapatos → Mocasines
-
-🌸 Belleza → Perfumes
-
-💻 Electrónicos → Computadoras
-
-📺 Electrónicos → Pantallas
-
-🎮 Electrónicos → Videojuegos / Xbox
-
-Resultado esperado:
-
-El usuario debe llegar al listado correspondiente.
-
-POS-003 — Agregar producto a la bolsa
-
-Prioridad: P0
-
-Validar:
-
-Producto
- ↓
-Características
- ↓
-Agregar a bolsa
- ↓
-Actualización del contador
-
-
-El contador de la bolsa debe reflejar el cambio después de agregar el producto.
-
-POS-004 — Agregar múltiples productos
-
-Prioridad: P0
-
-Flujo principal solicitado:
-
-Zapatos
-   ↓
-Perfume
-   ↓
-Computadora Lenovo
-   ↓
-Pantalla Sony
-   ↓
-Xbox
-   ↓
-Comprar ahora
-
-
-El framework valida el estado de la bolsa después de cada operación.
-
-POS-005 — Comprar ahora
-
-Prioridad: P0
-
-Validar que después de seleccionar un producto se pueda utilizar:
-
-Comprar ahora
-
-
-y que el usuario sea dirigido correctamente al flujo correspondiente.
-
-🔴 Casos negativos
-NEG-001 — Login inválido
-
-Prioridad: P1
-
-Validar que el sistema rechace información incorrecta.
-
-@Test(
-    description = "Login con información inválida",
-    groups = {"negative", "regression"}
-)
-public void loginWithInvalidCredentials() {
-    // Test
-}
-
-
-Resultado esperado:
-
-El usuario permanece en el formulario y se muestra la validación correspondiente.
-
-NEG-002 — Agregar producto sin características
-
-Prioridad: P0
-
-Intentar agregar un producto sin seleccionar una característica obligatoria.
-
-Ejemplos:
-
-Talla
-
-Color
-
-Capacidad
-
-Configuración
-
-Resultado esperado:
-
-El sistema debe impedir que el producto sea agregado.
-
-NEG-003 — Producto no disponible
-
-Prioridad: P1
-
-Validar el comportamiento cuando un producto deja de estar disponible.
-
-Resultado esperado:
-
-El sistema debe impedir la compra o mostrar la información correspondiente.
-
-🟡 Edge Cases
-EDGE-001 — Incrementar cantidad
-
-Prioridad: P1
-
-Validar:
-
-Cantidad = 1
-      ↓
-Cantidad = 2
-      ↓
-Cantidad = 3
-      ↓
-Agregar a bolsa
-
-
-La cantidad final debe ser consistente con el comportamiento de la aplicación.
-
-EDGE-002 — Agregar productos consecutivamente
-
-Prioridad: P0
-
-Validar que el contador de la bolsa se actualice correctamente después de varias operaciones consecutivas.
-
-El framework evita depender de:
-
-Thread.sleep()
-
-
-y utiliza esperas explícitas:
-
-homePage.waitForBagQuantityChange(previousQuantity);
-
-EDGE-003 — Modal de garantía
-
-Prioridad: P1
-
-Algunos productos pueden mostrar un modal de garantía después de agregarlos.
-
-El escenario valida:
-
-Agregar producto
-      ↓
-Modal garantía
-      ↓
-No agregar garantía
-      ↓
-Producto permanece en bolsa
-
-📊 Matriz de prioridades
-ID	Caso	Tipo	Prioridad
-POS-001	Login exitoso	Positivo	P0
-POS-002	Navegación categorías	Positivo	P0
-POS-003	Agregar producto	Positivo	P0
-POS-004	Múltiples productos	Positivo	P0
-POS-005	Comprar ahora	Positivo	P0
-NEG-001	Login inválido	Negativo	P1
-NEG-002	Características obligatorias	Negativo	P0
-NEG-003	Producto no disponible	Negativo	P1
-EDGE-001	Varias unidades	Edge	P1
-EDGE-002	Productos consecutivos	Edge	P0
-EDGE-003	Modal garantía	Edge	P1
-⏱️ Estrategia de sincronización
-
-Uno de los puntos importantes del framework es evitar esperas fijas innecesarias.
-
-En lugar de:
-
-Thread.sleep(10000);
-
-
-se utilizan esperas explícitas.
-
-Por ejemplo:
-
+```
+
+---
+
+ # 2\. Flujo E2E positivo — múltiples productos
+
+ ### ID
+
+ `TC-002`
+
+ ### Tipo
+
+ Functional / Regression
+
+ ### Prioridad
+
+ P0
+
+ Este es el flujo principal de compra automatizado.
+
+ El escenario navega por diferentes categorías, aplica filtros, configura productos, agrega productos a la bolsa y finalmente ejecuta `Comprar ahora`.
+
+ ### Flujo general
+
+```
+                         LOGIN
+                           │
+                           ▼
+                     CATEGORÍAS
+                           │
+            ┌──────────────┼──────────────┐
+            │              │              │
+            ▼              ▼              ▼
+         HOMBRE          BELLEZA      ELECTRÓNICOS
+            │              │              │
+            ▼              ▼              ▼
+         ZAPATOS        PERFUMES      PANTALLAS
+            │              │              │
+            ▼              ▼              ▼
+       MOCASINES       PERFUMES       SONY
+                         HOMBRE
+            │
+            │
+            └──────────────────────┐
+                                   │
+                                   ▼
+                              COMPUTADORAS
+                                   │
+                                   ▼
+                                 LENOVO
+                                   │
+                                   ▼
+                            CONFIGURACIÓN
+                                   │
+                                   ▼
+                            AGREGAR BOLSA
+                                   │
+                                   ▼
+                          VALIDAR CONTADOR
+                                   │
+                                   ▼
+                            COMPRAR AHORA
+```
+
+ ### Productos involucrados
+
+ El flujo utiliza diferentes categorías para validar distintos comportamientos:
+
+```
+Hombre
+ └── Zapatos
+      ├── Mocasines
+      └── Botas
+
+Belleza
+ └── Perfumes
+      └── Perfumes Hombre
+
+Electrónicos
+ ├── Pantallas
+ │    └── Sony
+ │
+ └── Computadoras
+      └── Lenovo
+```
+
+ ### Validación de la bolsa
+
+ Antes de agregar cada producto se obtiene la cantidad actual:
+
+```
+int bagBeforeProduct =
+        homePage.getCurrentBagQuantity();
+```
+
+ Después de agregarlo se espera el cambio del contador:
+
+```
 homePage.waitForBagQuantityChange(
-    bagBeforeProduct
+        bagBeforeProduct
+);
+```
+
+ Finalmente se valida que el contador haya aumentado:
+
+```
+int bagAfterProduct =
+        homePage.getCurrentBagQuantity();
+
+Assert.assertTrue(
+        bagAfterProduct > bagBeforeProduct,
+        "Product was not reflected in the shopping bag"
+);
+```
+
+ ### Ventaja
+
+ La prueba no asume que la actualización del carrito sea inmediata. La validación espera el cambio real del estado de la aplicación.
+
+---
+
+ # 3\. Agregar producto sin sesión activa
+
+ ### ID
+
+ `TC-003`
+
+ ### Tipo
+
+ Negative / Regression
+
+ ### Prioridad
+
+ P1
+
+ ### Descripción
+
+ Valida el comportamiento cuando un usuario intenta continuar con la compra sin tener una sesión activa.
+
+ ### Flujo
+
+```
+┌──────────────┐
+│ Home         │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Categoría    │
+│ Hombre       │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Zapatos      │
+│ Mocasines    │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Producto     │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Comprar ahora│
+└──────┬───────┘
+       │
+       ▼
+┌──────────────────┐
+│ Formulario Login │
+└──────────────────┘
+```
+
+ ### Validación
+
+ Se espera que el formulario de autenticación sea mostrado:
+
+```
+Assert.assertTrue(
+    loginPage.isFormDisplayed(),
+    "Login form is not displayed"
+);
+```
+
+---
+
+ # 4\. Producto sin características obligatorias
+
+ ### ID
+
+ `TC-004`
+
+ ### Tipo
+
+ Negative / Regression
+
+ ### Prioridad
+
+ P0
+
+ ### Descripción
+
+ Valida que un producto que requiere información obligatoria no pueda agregarse a la bolsa mientras dicha información no haya sido seleccionada.
+
+ Ejemplos de información obligatoria:
+
+```
+Producto
+   │
+   ├── Talla
+   ├── Color
+   ├── Capacidad
+   └── Configuración
+```
+
+ ### Flujo
+
+```
+┌─────────────────┐
+│ Seleccionar     │
+│ producto        │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Agregar a bolsa │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ ¿Faltan datos?  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Mostrar error   │
+└─────────────────┘
+```
+
+ ### Validación
+
+```
+productPage.addProductToBag(false);
+
+Assert.assertTrue(
+    productPage.isErrorMessageDisplayed(),
+    "Error message is not being displayed"
+);
+```
+
+ El caso valida que la aplicación impida continuar cuando existen características obligatorias sin seleccionar.
+
+---
+
+ # 5\. Comprar ahora después de refresh
+
+ ### ID
+
+ `TC-005`
+
+ ### Tipo
+
+ Edge / Regression
+
+ ### Prioridad
+
+ P1
+
+ ### Descripción
+
+ Valida que la información del producto seleccionado para `Comprar ahora` permanezca consistente después de actualizar la página.
+
+ ### Flujo
+
+```
+┌──────────────┐
+│ Seleccionar  │
+│ producto     │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Comprar ahora│
+└──────┬───────┘
+       │
+       ▼
+┌─────────────────────┐
+│ Capturar información│
+│ precio / cantidad   │
+└──────────┬──────────┘
+           │
+           ▼
+      REFRESH PAGE
+           │
+           ▼
+┌─────────────────────┐
+│ Validar nuevamente  │
+│ precio / cantidad   │
+└─────────────────────┘
+```
+
+ ### Datos validados
+
+ Antes del refresh:
+
+```
+double originalItemPrice =
+        buyNowPage.getOriginalItemPrice();
+
+int currentProductQuantity =
+        buyNowPage.getCurrentProductQuantity();
+```
+
+ Después:
+
+```
+driver.navigate().refresh();
+```
+
+ Se comparan nuevamente los valores:
+
+```
+Assert.assertEquals(
+    originalItemPrice,
+    buyNowPage.getOriginalItemPrice(),
+    "Product's price doesn't remain the same after refresh"
 );
 
+Assert.assertEquals(
+    currentProductQuantity,
+    buyNowPage.getCurrentProductQuantity(),
+    "Product's quantity doesn't remain the same after refresh"
+);
+```
 
-La validación se basa en el cambio real del estado de la aplicación.
+---
 
-Esto resulta especialmente importante para el contador de la bolsa, ya que la actualización puede ser asíncrona.
+ # 6\. Cantidad superior a la disponible
 
-🛒 Validación de la bolsa
+ ### ID
 
-El framework obtiene el contador utilizando el atributo data-testid del componente del header.
+ `TC-006`
 
+ ### Tipo
+
+ Edge / Regression
+
+ ### Prioridad
+
+ P1
+
+ ### Descripción
+
+ Valida el comportamiento de la aplicación cuando se intenta agregar una cantidad superior a la disponibilidad permitida del producto.
+
+ En la prueba se establece:
+
+```
+productPage.setProductQuantity(100);
+```
+
+ Posteriormente se intenta agregar el producto:
+
+```
+productPage.addProductToBag(false);
+```
+
+ ### Flujo
+
+```
+┌──────────────────────┐
+│ Seleccionar producto │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Solicitar cantidad   │
+│ 100 unidades         │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Agregar a bolsa      │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Validar resultado    │
+└──────────┬───────────┘
+           │
+           ▼
+     No debe existir
+     agregado exitoso
+```
+
+ ### Validación
+
+```
+Assert.assertFalse(
+    productPage.isSuccessMessageDisplayed()
+);
+```
+
+---
+
+ # Matriz de pruebas
+
+ | ID | Caso | Tipo | Prioridad | Grupo |
+| --- | --- | --- | --- | --- |
+| TC-001 | Login exitoso | Functional | P0 | functional / regression |
+| TC-002 | Flujo E2E múltiples productos | Functional | P0 | functional / regression |
+| TC-003 | Compra sin sesión activa | Negative | P1 | negative / regression |
+| TC-004 | Producto sin características obligatorias | Negative | P0 | negative / regression |
+| TC-005 | Comprar ahora después de refresh | Edge | P1 | edge / regression |
+| TC-006 | Cantidad superior a disponibilidad | Edge | P1 | edge / regression |
+
+---
+
+ # Sincronización
+
+ El framework evita depender de esperas fijas como:
+
+```
+Thread.sleep(10000);
+```
+
+ En su lugar utiliza esperas explícitas basadas en el estado de la aplicación.
+
+ Por ejemplo:
+
+```
+int previousQuantity =
+        homePage.getCurrentBagQuantity();
+
+productPage.addProductToBag(true);
+
+homePage.waitForBagQuantityChange(
+        previousQuantity
+);
+```
+
+ Esto permite sincronizar la prueba con el comportamiento real de la aplicación.
+
+---
+
+ # Validación del contador de la bolsa
+
+ El contador se obtiene desde el elemento del header.
+
+ El framework utiliza un selector basado en `data-testid`:
+
+```
 private final By bagQuantity =
     By.cssSelector(
         "div[data-testid$='-header-shopping-cart-header-cart-quantity']"
     );
+```
 
+ La estrategia utilizada es:
 
-La validación se realiza mediante:
+```
+Cantidad anterior
+       │
+       ▼
+Agregar producto
+       │
+       ▼
+Esperar actualización
+       │
+       ▼
+Obtener cantidad nueva
+       │
+       ▼
+Comparar
+```
 
-int previousQuantity =
-    homePage.getCurrentBagQuantity();
+ Esto evita asumir que la actualización del carrito ocurre inmediatamente.
 
-productPage.addProductToBag();
+---
 
-homePage.waitForBagQuantityChange(
-    previousQuantity
-);
+ # Manejo de productos dinámicos
 
-int currentQuantity =
-    homePage.getCurrentBagQuantity();
+ Los resultados de productos pueden cambiar entre ejecuciones.
 
+ Por esta razón, el framework utiliza principalmente atributos estables como:
 
-Esto evita asumir que el contador representa necesariamente el total de unidades.
-
-🔄 Manejo de productos dinámicos
-
-Los listados de productos pueden cambiar entre ejecuciones.
-
-Por esta razón, el framework utiliza selectores basados principalmente en:
-
+```
 data-testid
+```
 
+ Ejemplo:
 
-en lugar de depender exclusivamente de clases CSS generadas dinámicamente.
-
-Ejemplo:
-
+```
 button[data-testid$='add-to-bag-button']
+```
 
-🧩 Manejo de errores
+ Sin embargo, actualmente algunos escenarios utilizan la posición del producto:
 
-El framework contempla situaciones comunes de Selenium:
+```
+categoryPage.selectItemByNumberInPage(4);
+```
 
-TimeoutException
-NoSuchElementException
-StaleElementReferenceException
-NumberFormatException
+ Esto representa un punto de atención para la estabilidad de las pruebas.
 
+---
 
-También existen reintentos controlados para elementos cuyo DOM puede cambiar durante la interacción.
+ # ExtentReports
 
-📈 ExtentReports
+ El framework utiliza **ExtentReports 5.1.2** para generar reportes HTML.
 
-Las ejecuciones generan un reporte HTML mediante ExtentReports.
+ El reporte se genera en:
 
-Ubicación:
+```
+target/ExtentReports/RegressionReport.html
+```
 
-target/RegressionReport.html
+ Después de ejecutar:
 
-
-Ejemplo de evidencia:
-
-El reporte permite revisar:
-
-Estado de las pruebas.
-
-Duración.
-
-Ambiente.
-
-Sistema operativo.
-
-Versión de Java.
-
-Resultados de ejecución.
-
-▶️ Ejecución
-Ejecutar la suite completa
+```
 mvn clean test
+```
 
-Ejecutar Chrome
+ la estructura esperada es:
+
+```
+target/
+└── ExtentReports/
+    └── RegressionReport.html
+```
+
+ El reporte contiene información de la ejecución y datos del ambiente.
+
+ Entre ellos:
+
+```
+OS
+OS Version
+Java
+Browser
+Environment
+Headless
+```
+
+ La configuración visual del reporte se mantiene en:
+
+```
+src/main/java/config/reporter.json
+```
+
+ Configuración utilizada:
+
+```
+{
+  "theme": "DARK",
+  "encoding": "utf-8",
+  "protocol": "HTTPS",
+  "timelineEnabled": true,
+  "offlineMode": false,
+  "documentTitle": "Reporte de Regresion",
+  "reportName": "Liverpool Regression Suite",
+  "timeStampFormat": "MMM dd, yyyy HH:mm:ss a"
+}
+```
+
+---
+
+ # Estructura de reportes
+
+ Durante la ejecución Maven también genera los resultados propios de Surefire:
+
+```
+target/
+├── ExtentReports/
+│   └── RegressionReport.html
+│
+└── surefire-reports/
+    ├── *.xml
+    ├── *.txt
+    └── otros archivos de ejecución
+```
+
+ `ExtentReports` proporciona la visualización HTML de la ejecución, mientras que `Surefire` contiene los resultados utilizados por Maven/TestNG.
+
+---
+
+ # Configuración de ejecución
+
+ Los parámetros principales se encuentran configurados en `pom.xml`.
+
+ Ejemplo:
+
+```
+<browser>chrome</browser>
+<environment>qa</environment>
+<headless>false</headless>
+```
+
+ Estos valores pueden sobrescribirse desde Maven.
+
+---
+
+ # Requisitos
+
+ Antes de ejecutar el proyecto se requiere:
+
+ - Java 17 o superior.
+- Maven 3.8 o superior.
+- Google Chrome instalado.
+- Acceso a Internet.
+- Acceso al ambiente de Liverpool utilizado para las pruebas.
+- Proyecto correctamente configurado en IntelliJ IDEA, Eclipse o IDE equivalente.
+
+ Validar Java:
+
+```
+java -version
+```
+
+ Validar Maven:
+
+```
+mvn -version
+```
+
+---
+
+ # Setup del proyecto
+
+ Clonar el repositorio y acceder al proyecto:
+
+```
+git clone <repository-url>
+cd liverpool-automation
+```
+
+ Verificar que Maven pueda resolver las dependencias:
+
+```
+mvn clean
+```
+
+ Compilar el proyecto:
+
+```
+mvn compile
+```
+
+ Ejecutar las pruebas:
+
+```
+mvn test
+```
+
+---
+
+ # Ejecución con Maven
+
+ ## Suite completa
+
+```
+mvn clean test
+```
+
+ ## Chrome
+
+```
 mvn clean test -Dbrowser=chrome
+```
 
-Ejecutar en headless
+ ## Headless
+
+```
 mvn clean test -Dheadless=true
+```
 
-Ejecutar ambiente QA
+ ## Ambiente QA
+
+```
 mvn clean test -Denvironment=qa
+```
 
-Ejecutar combinando parámetros
+ ## Combinando parámetros
+
+```
 mvn clean test -Dbrowser=chrome -Denvironment=qa -Dheadless=true
+```
 
-🧪 Grupos TestNG
+---
 
-Los casos pueden ejecutarse por grupos.
+ # Ejecución por grupos TestNG
 
-Smoke
+ Los casos utilizan los siguientes grupos:
+
+```
+functional
+negative
+edge
+regression
+```
+
+ ## Functional
+
+```
 <groups>
     <run>
-        <include name="smoke"/>
+        <include name="functional"/>
     </run>
 </groups>
+```
 
-Positivos
-<groups>
-    <run>
-        <include name="positive"/>
-    </run>
-</groups>
+ ## Negative
 
-Negativos
+```
 <groups>
     <run>
         <include name="negative"/>
     </run>
 </groups>
+```
 
-Edge
+ ## Edge
+
+```
 <groups>
     <run>
         <include name="edge"/>
     </run>
 </groups>
+```
 
-Regresión
+ ## Regression
+
+```
 <groups>
     <run>
         <include name="regression"/>
     </run>
 </groups>
+```
 
-⚠️ Riesgos identificados
-Productos dinámicos
+---
 
-Los productos pueden cambiar de posición, precio o disponibilidad.
+ # Setup de TestNG
 
-Por este motivo, seleccionar productos únicamente por índice puede provocar inestabilidad.
+ La clase `PurchaseTest` inicializa el driver y los Page Objects:
 
-Cambios en la UI
+```
+PurchaseTest
+     │
+     ▼
+setUp()
+     │
+     ├── DriverManager
+     │
+     ├── HomePage
+     │
+     ├── LoginPage
+     │
+     ├── CategoryPage
+     │
+     ├── ProductPage
+     │
+     └── BuyNowPage
+```
 
-Cambios en:
+ El navegador utilizado actualmente es Chrome:
 
+```
+DriverManager.setDriver("chrome");
+```
+
+---
+
+ # Dependencias Maven
+
+ Las principales dependencias utilizadas son:
+
+```
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-java</artifactId>
+    <version>4.44.0</version>
+</dependency>
+```
+
+```
+<dependency>
+    <groupId>org.testng</groupId>
+    <artifactId>testng</artifactId>
+    <version>7.10.2</version>
+    <scope>test</scope>
+</dependency>
+```
+
+```
+<dependency>
+    <groupId>com.aventstack</groupId>
+    <artifactId>extentreports</artifactId>
+    <version>5.1.2</version>
+</dependency>
+```
+
+```
+<dependency>
+    <groupId>io.github.bonigarcia</groupId>
+    <artifactId>webdrivermanager</artifactId>
+    <version>6.3.4</version>
+</dependency>
+```
+
+---
+
+ # Manejo de errores
+
+ El framework contempla problemas comunes durante la automatización UI, incluyendo:
+
+```
+TimeoutException
+NoSuchElementException
+StaleElementReferenceException
+NumberFormatException
+```
+
+ También se utilizan mecanismos de reintento controlados para elementos cuyo DOM puede cambiar durante la ejecución.
+
+---
+
+ # Riesgos y defectos identificados
+
+ ## Productos dinámicos
+
+ Los productos disponibles pueden cambiar entre ejecuciones.
+
+ Esto puede afectar:
+
+ - Posición del producto.
+- Precio.
+- Disponibilidad.
+- Resultados del listado.
+- Cantidad disponible.
+
+ Actualmente algunos casos seleccionan productos mediante posición:
+
+```
+selectItemByNumberInPage(4);
+```
+
+ Por lo tanto, un cambio en el orden del listado puede provocar una falla aunque la funcionalidad continúe operando correctamente.
+
+---
+
+ ## Filtros de talla y color
+
+ Existe un riesgo funcional importante en la experiencia de selección de productos.
+
+ Aunque el usuario aplique filtros de **talla o color desde el listado de productos**, al entrar posteriormente al detalle del producto, algunos zapatos pueden requerir nuevamente la selección de talla o color.
+
+ El comportamiento puede representarse así:
+
+```
+Listado de productos
+        │
+        ▼
+Filtro: Color
+        │
+        ▼
+Filtro: Talla
+        │
+        ▼
+Producto filtrado
+        │
+        ▼
+Detalle del producto
+        │
+        ▼
+¿Talla / color seleccionado?
+        │
+        └────── NO ──────► Solicitar nuevamente selección
+```
+
+ ### Riesgo / defecto
+
+ El filtro aplicado en el listado no necesariamente se conserva como selección de la variante del producto.
+
+ Esto puede generar:
+
+ - Confusión para el usuario.
+- Selección repetida de atributos.
+- Intentos de agregar productos sin completar características obligatorias.
+- Errores al utilizar `Agregar a bolsa`.
+- Diferencia entre el producto filtrado y la variante realmente seleccionada.
+
+ Este comportamiento debe considerarse un **riesgo funcional y potencial defecto de UX**, especialmente en productos como zapatos donde talla y color son atributos relevantes para la compra.
+
+---
+
+ ## Cambios en la UI
+
+ Cambios en elementos como:
+
+```
 data-testid
 HTML
 textos
 categorías
 filtros
+estructura del DOM
+```
 
+ pueden requerir modificaciones en los Page Objects.
 
-pueden requerir modificaciones en los Page Objects.
+---
 
-Dependencia del ambiente
+ ## Dependencia del ambiente
 
-Las pruebas dependen de la disponibilidad del sitio y de sus servicios externos.
+ Las pruebas dependen de la disponibilidad del sitio web y de servicios externos.
 
-Autenticación
+ Una falla de red, disponibilidad del ambiente o servicio externo puede provocar una falla de automatización que no necesariamente representa un defecto funcional.
 
-El proceso de autenticación puede incluir mecanismos adicionales que afecten la automatización.
+---
 
-Datos variables
+ ## Datos variables
 
-Los filtros y resultados de búsqueda pueden variar durante diferentes ejecuciones.
+ Los resultados de categorías, filtros y productos pueden variar entre ejecuciones.
 
-🚀 Mejoras futuras
+ Por este motivo, los escenarios que dependen de productos específicos pueden requerir mantenimiento.
 
-📸 Capturas automáticas cuando una prueba falla.
+---
 
-📹 Video automático de ejecución.
+ ## Disponibilidad de productos
 
-🔎 Selección de productos por nombre en lugar de índice.
+ Un producto utilizado durante una prueba puede:
 
-📊 DataProviders de TestNG.
+ - Agotarse.
+- Cambiar de precio.
+- Cambiar de categoría.
+- Cambiar de disponibilidad.
+- Dejar de aparecer en los resultados esperados.
 
-⚡ Ejecución paralela.
+ Esto puede afectar la estabilidad de la prueba.
 
-🌐 Ejecución cross-browser.
+---
 
-🔄 Integración CI/CD.
+ # Flujo E2E principal
 
-📦 Generación automática de artefactos.
+ El flujo funcional principal implementado actualmente puede representarse de la siguiente manera:
 
-📈 Integración de reportes con pipeline.
+```
+                         ┌──────────────┐
+                         │    LOGIN     │
+                         └──────┬───────┘
+                                │
+                                ▼
+                       ┌──────────────────┐
+                       │    CATEGORÍAS    │
+                       └────────┬─────────┘
+                                │
+             ┌──────────────────┼───────────────────┐
+             │                  │                   │
+             ▼                  ▼                   ▼
+        ┌─────────┐        ┌─────────┐        ┌────────────┐
+        │ HOMBRE  │        │ BELLEZA │        │ELECTRÓNICA │
+        └────┬────┘        └────┬────┘        └─────┬──────┘
+             │                  │                   │
+             ▼                  ▼                   ├────────────┐
+        ┌─────────┐        ┌─────────┐              │            │
+        │ ZAPATOS │        │ PERFUMES│              ▼            ▼
+        └────┬────┘        └─────────┘          PANTALLAS    COMPUTADORAS
+             │                                    │            │
+             ▼                                    ▼            ▼
+        MOCASINES                                SONY        LENOVO
+             │
+             ▼
+       FILTROS / TALLA
+             │
+             ▼
+       CONFIGURACIÓN
+             │
+             └─────────────────────┐
+                                   ▼
+                           AGREGAR A BOLSA
+                                   │
+                                   ▼
+                          VALIDAR CONTADOR
+                                   │
+                                   ▼
+                             COMPRAR AHORA
+```
 
-🧪 Mayor cobertura de escenarios negativos.
+---
 
-📋 Flujo certificado
+ # Flujo negativo
 
-El flujo principal cubierto por la automatización es:
-
-                    LOGIN
+```
+             PRODUCTO
+                │
+                ▼
+       ¿Sesión iniciada?
+          │           │
+         NO          SÍ
+          │           │
+          ▼           ▼
+       LOGIN       ¿Datos
+       FORM        obligatorios?
                       │
-                      ▼
-              CATEGORÍAS
-                      │
-          ┌───────────┼───────────┐
-          ▼           ▼           ▼
-       ZAPATOS      PERFUMES   ELECTRÓNICOS
-          │                       │
-      ┌───┴───┐             ┌─────┼─────┐
-      ▼       ▼             ▼     ▼     ▼
-    BOTAS  MOCASINES      LENOVO  SONY  XBOX
-      │       │             │     │     │
-      └───────┴─────────────┴─────┴─────┘
-                      │
-                      ▼
-                AGREGAR A BOLSA
-                      │
-                      ▼
-               VALIDAR BOLSA
-                      │
-                      ▼
-                 COMPRAR AHORA
+                  ┌───┴───┐
+                 NO      SÍ
+                  │        │
+                  ▼        ▼
+                ERROR    AGREGAR
+                         A BOLSA
+```
 
-📦 Entregables
+---
 
-El proyecto contempla los siguientes entregables:
+ # Flujo Edge Case
 
-Código fuente del framework.
+```
+                 PRODUCTO
+                    │
+                    ▼
+             Comprar ahora
+                    │
+                    ▼
+            Capturar precio
+            Capturar cantidad
+                    │
+                    ▼
+                 REFRESH
+                    │
+                    ▼
+            Validar información
+                    │
+              ┌─────┴─────┐
+             OK           KO
+              │            │
+              ▼            ▼
+            PASS         FAIL
+```
 
-Page Objects.
+ Otro escenario Edge:
 
-Casos de prueba TestNG.
-
-testng.xml.
-
-pom.xml.
-
-Configuración de ExtentReports.
-
-README con documentación.
-
-Reporte de ejecución.
-
-Evidencias de ejecución.
-
-Video explicativo de la solución.
-
-📌 Resultado esperado
-
-La solución debe permitir ejecutar de forma automatizada los escenarios críticos del flujo de compra de Liverpool:
-
-Login
-  ↓
-Navegación
-  ↓
-Selección
-  ↓
-Configuración
-  ↓
+```
+Producto
+   │
+   ▼
+Cantidad = 100
+   │
+   ▼
 Agregar a bolsa
-  ↓
-Validar bolsa
-  ↓
-Comprar ahora
+   │
+   ▼
+Validar disponibilidad
+   │
+   ▼
+No debe existir
+agregado exitoso
+```
+
+---
+
+ # Resultados esperados
+
+ La suite debe permitir identificar rápidamente problemas en los puntos críticos del proceso:
+
+```
+LOGIN
+  │
+  ▼
+NAVEGACIÓN
+  │
+  ▼
+FILTROS
+  │
+  ▼
+SELECCIÓN
+  │
+  ▼
+CONFIGURACIÓN
+  │
+  ▼
+AGREGAR A BOLSA
+  │
+  ▼
+VALIDAR BOLSA
+  │
+  ▼
+COMPRAR AHORA
+```
+
+ Los escenarios negativos y edge permiten adicionalmente validar el comportamiento de la aplicación ante condiciones que no representan el flujo ideal.
+
+---
+
+ # Entregables
+
+ El proyecto contempla:
+
+```
+Código fuente
+     │
+     ├── Page Objects
+     ├── TestNG Tests
+     ├── DriverManager
+     ├── Utilities
+     ├── testng.xml
+     ├── pom.xml
+     ├── reporter.json
+     └── ExtentReports
+```
+
+ Reporte generado:
+
+```
+target/ExtentReports/RegressionReport.html
+```
+
+ Resultados Maven/Surefire:
+
+```
+target/surefire-reports/
+```
+
+---
+
+ # Resultado
+
+ El framework automatiza actualmente **6 escenarios prioritarios**:
+
+```
+┌─────────┬─────────────────────────────────────────────┐
+│ TC-001  │ Login exitoso                               │
+├─────────┼─────────────────────────────────────────────┤
+│ TC-002  │ Flujo E2E con múltiples productos           │
+├─────────┼─────────────────────────────────────────────┤
+│ TC-003  │ Compra sin sesión activa                    │
+├─────────┼─────────────────────────────────────────────┤
+│ TC-004  │ Producto sin características obligatorias   │
+├─────────┼─────────────────────────────────────────────┤
+│ TC-005  │ Comprar ahora después de refresh            │
+├─────────┼─────────────────────────────────────────────┤
+│ TC-006  │ Cantidad superior a disponibilidad          │
+└─────────┴─────────────────────────────────────────────┘
 
 
-La automatización se enfoca en los escenarios de mayor prioridad para reducir el riesgo sobre las funcionalidades principales del proceso de compra.
+ Este README ya queda alineado con el código real de `PurchaseTest`: **no documenta casos que actualmente no existen** y deja explícito el riesgo de que los filtros de talla/color del listado no necesariamente se conserven en el detalle del producto.
