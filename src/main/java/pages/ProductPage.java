@@ -108,6 +108,8 @@ public class ProductPage extends BasePage {
                     "//details[contains(@data-testid,'configurator-size-picker')]"
             );
 
+    private final By firstSizePicker = By.xpath("(//input[@name='size-picker'])[1]");
+
     // Stores the total quantity added for each product.
     private final Map<String, Integer> productsQuantity = new HashMap<>();
 
@@ -140,13 +142,28 @@ public class ProductPage extends BasePage {
     /**
      * Adds the current product to the shopping bag.
      *
-     * If mandatory product options have not been selected,
-     * the first available option is selected and the product
-     * is added again.
+     * When {@code force} is {@code false}, the method only performs
+     * the initial add-to-bag action and does not attempt to resolve
+     * mandatory product options.
+     *
+     * When {@code force} is {@code true}, the method checks whether
+     * the product was rejected because a mandatory option was not
+     * selected. If so, it selects the first available option and
+     * attempts to add the product again.
+     *
+     * If the product is still rejected after selecting the mandatory
+     * option, the method retries the operation recursively.
+     *
+     * @param force indicates whether mandatory product options should
+     *              be automatically selected when required
      */
-    public void addProductToBag() {
+    public void addProductToBag(boolean force) {
 
         robustClick(addToBagButton);
+
+        if (!force) {
+            return;
+        }
 
         if (!isErrorMessageDisplayed()) {
             return;
@@ -157,7 +174,7 @@ public class ProductPage extends BasePage {
         robustClick(addToBagButton);
 
         if (isErrorMessageDisplayed()) {
-            addProductToBag();
+            addProductToBag(true);
         }
     }
 
@@ -354,6 +371,25 @@ public class ProductPage extends BasePage {
                     )
             );
         }
+    }
+
+    public void selectFirstSizePicker() throws InterruptedException {
+        WebDriverWait optionWait =
+                new WebDriverWait(driver, Duration.ofSeconds(10));
+        robustClick(detailsButton);
+        robustClick(firstSizePicker);
+        WebElement element = driver.findElement(firstSizePicker);
+
+        By currentValueXpath = By.xpath("(//details[contains(@data-testid,'configurator-size-picker')]//div)[1]/p[2]");
+        WebElement currentValue = driver.findElement(currentValueXpath);
+
+        optionWait.until(
+                ExpectedConditions.textToBePresentInElement(
+                        currentValue,
+                        element.getAttribute("value")
+                )
+        );
+
     }
 }
 

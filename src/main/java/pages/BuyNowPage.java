@@ -20,7 +20,6 @@ public class BuyNowPage extends BasePage {
     private final By productQuantity = By.cssSelector("input[data-testid$='input-cart-item-wrapper-input-cart-item-quantity-input']");
     private final By totalPrice = By.xpath("(//div[contains(@data-testid,'input-cart-item-wrapper-input-cart-item-total')]/span/span)[1]");
     private final By originalItemUnitPrice = By.xpath("(//div[contains(@data-testid,'input-cart-item-wrapper-input-cart-item-price')]/span[contains(@data-testid,'original')]/span)[1]");
-
     private final By subtotalParagraph = By.xpath("//p[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'subtotal')]");
     private final By subtotalPrice = By.xpath("//p[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'subtotal')]/parent::div//div/span");
 
@@ -51,21 +50,38 @@ public class BuyNowPage extends BasePage {
 
     public double getPrice(String text) {
 
+        if (text == null || text.trim().isEmpty()) {
+            return 0.0;
+        }
 
-        // Matches optional sign, optional digits, optional decimal point, and digits
-        Pattern pattern = Pattern.compile("[-+]?\\d*\\.?\\d+");
-        Matcher matcher = pattern.matcher(text);
+        String cleanText = text
+                .replace(",", "")
+                .trim();
+
+        Pattern pattern =
+                Pattern.compile("[-+]?\\d*\\.?\\d+");
+
+        Matcher matcher =
+                pattern.matcher(cleanText);
 
         if (matcher.find()) {
-            return Double.parseDouble(matcher.group()); // Output: -15.5
+            return Double.parseDouble(matcher.group());
         }
+
         return 0.0;
     }
 
-    public  String getOriginalItemPrice(){
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.presenceOfElementLocated(originalItemUnitPrice));
-        return getTextFromElement(driver.findElement(originalItemUnitPrice));
+
+    public  double getOriginalItemPrice(){
+        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(originalItemUnitPrice));
+            return getPrice(getTextFromElement(driver.findElement(originalItemUnitPrice)));
+        }
+        catch (Exception e){
+            wait.until(ExpectedConditions.presenceOfElementLocated(itemUnitPrice));
+            return getPrice(getTextFromElement(driver.findElement(itemUnitPrice)));
+        }
     }
 
 

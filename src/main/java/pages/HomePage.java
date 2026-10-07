@@ -158,7 +158,7 @@ public class HomePage extends BasePage {
 
         waitForElementToBePresent(
                 loginButton,
-                2
+                60
         );
 
         String currentLogin =

@@ -34,66 +34,11 @@ public class ApiTest extends BaseTest {
         Assert.assertTrue(homePage.isLoginSuccessful(),"");
     }
 
-    @Test(description = "Flujo e2e positivo",groups = {"functional","regression"},
-            testName = "prueba funcional 1",dependsOnMethods = {"login"})
-    public void genericTest() throws InterruptedException {
-        /*
-        homePage.clickCategoriesButton();
-        Assert.assertTrue(homePage.isCategoriesMenuPresent(),"is not displayed");
-        homePage.clickCategory("hombre");
-        Assert.assertTrue(categoryPage.getRootLevelCategory().equalsIgnoreCase("hombre"),"");
-        categoryPage.clickCategory("zapatos");
-        categoryPage.clickCategory("mocasines");
-        categoryPage.selectCategoryFilter("color","azul claro");
-        categoryPage.selectCategoryFilter("talla","22");
-        categoryPage.selectItemByNumberInPage(0);
-        productPage.addProductToBag();
-        Assert.assertTrue(productPage.isSuccessMessageDisplayed(),"no se agrego producto");
-        homePage.clickCategoriesButton();
-        homePage.clickCategory("belleza");
-        categoryPage.clickCategory("perfumes");
-        categoryPage.clickCategory("perfumes hombre");
-        categoryPage.selectCategoryFilter("fragancia","floral");
-        categoryPage.selectItemByNumberInPage(6);
-        int currentBag = Integer.parseInt(homePage.getCurrentBagQuantity());
-        System.out.println("Current bag quantity 1"+currentBag);
-        productPage.increaseProductQuantity();
-        int productsToBeAdded = productPage.getCurrentProductQuantity();
-        productPage.addProductToBag();
-        System.out.println("product quantity"+productsToBeAdded);
-        Assert.assertTrue(productPage.isSuccessMessageDisplayed(),"no se agrego product");
-        int finalProducts = currentBag + productsToBeAdded;
-        System.out.println("Current bag quantity 2"+Integer.parseInt(homePage.getCurrentBagQuantity()));
-        Thread.sleep(100000);
-        Assert.assertTrue(Integer.parseInt(homePage.getCurrentBagQuantity())==finalProducts,"no son iguales");
-        homePage.clickCategoriesButton();
-        homePage.clickCategory("electr");
-        categoryPage.clickCategory("computa");
-        categoryPage.clickCategory("computadoras");
-        categoryPage.filterByBrand("lenovo");
-        categoryPage.selectItemByNumberInPage(1);
-        currentBag = Integer.parseInt(homePage.getCurrentBagQuantity());
-        productPage.increaseProductQuantity();
-        productPage.increaseProductQuantity();
-        productsToBeAdded = productPage.getCurrentProductQuantity();
-        productPage.addProductToBag();
-        productPage.dontAddWarranty();
-        finalProducts = currentBag + productsToBeAdded;
-        //.getCurrentBagQuantity());
-        //Assert.assertTrue(Integer.parseInt(homePage.getCurrentBagQuantity())==finalProducts,"no son iguales");
-        productPage.clickBuyNow();
-        BuyNowPage buyNow = new BuyNowPage(driver);
-        System.out.println(buyNow.getOriginalItemPrice());
-*/
 
-    }
     @Test(description = "Flujo e2e positivo",groups = {"functional","regression"},
             testName = "prueba funcional 1",dependsOnMethods = {"login"})
     public void addMultipleProductsAndValidateShoppingBag() throws InterruptedException {
 
-        // ============================================================
-        // PRODUCT 1 - MEN'S LOAFERS
-        // ============================================================
 
         homePage.clickCategoriesButton();
 
@@ -137,7 +82,7 @@ public class ApiTest extends BaseTest {
 
 
         // Add product
-        productPage.addProductToBag();
+        productPage.addProductToBag(true);
 
 
         // Wait until the header counter changes
@@ -166,9 +111,26 @@ public class ApiTest extends BaseTest {
         );
 
 
-        // ============================================================
-        // PRODUCT 2 - MEN'S PERFUME
-        // ============================================================
+        homePage.clickCategoriesButton();
+
+        homePage.clickCategory("hombre");
+
+        categoryPage.clickCategory("zapatos");
+        categoryPage.clickCategory("botas");
+
+        categoryPage.selectCategoryFilter(
+                "color",
+                "caf"
+        );
+
+
+
+        categoryPage.selectItemByNumberInPage(0);
+        productPage.increaseProductQuantity();
+        productPage.selectFirstSizePicker();
+
+
+
 
         homePage.clickCategoriesButton();
 
@@ -208,7 +170,7 @@ public class ApiTest extends BaseTest {
 
 
         // Add second product
-        productPage.addProductToBag();
+        productPage.addProductToBag(true);
 
 
         // Wait for header cart to update
@@ -236,9 +198,14 @@ public class ApiTest extends BaseTest {
         );
 
 
-        // ============================================================
-        // PRODUCT 3 - LENOVO COMPUTER
-        // ============================================================
+
+        homePage.clickCategoriesButton();
+        homePage.clickCategory("electr");
+        categoryPage.clickCategory("tv");
+        categoryPage.clickCategory("pantallas");
+        categoryPage.filterByBrand("sony");
+        categoryPage.selectItemByNumberInPage(4);
+        productPage.addProductToBag(true);
 
         homePage.clickCategoriesButton();
 
@@ -276,7 +243,7 @@ public class ApiTest extends BaseTest {
 
 
         // Add third product
-        productPage.addProductToBag();
+        productPage.addProductToBag(false);
 
 
         // Warranty modal is optional
@@ -308,18 +275,142 @@ public class ApiTest extends BaseTest {
         );
 
 
-        // ============================================================
-        // BUY NOW
-        // ============================================================
-
         productPage.clickBuyNow();
-        Thread.sleep(10000);
         System.out.println(
                 "Original item price: "
                         + buyNowPage.getOriginalItemPrice()
         );
 
     }
+
+
+    @Test(description = "Flujo agregar a bolsa producto sin sesion iniciada",groups = {"negative","regression"},
+            testName = "prueba negativa producto sin todos detalles mandatorios incluidos")
+    public void addProductWithOutActiveSession() throws InterruptedException {
+        homePage.navigateTo();
+        homePage.clickCategoriesButton();
+
+        Assert.assertTrue(
+                homePage.isCategoriesMenuPresent(),
+                "Categories menu is not displayed"
+        );
+
+        homePage.clickCategory("hombre");
+
+        Assert.assertEquals(
+                categoryPage.getRootLevelCategory(),
+                "Hombre",
+                "Root category is incorrect"
+        );
+
+        categoryPage.clickCategory("zapatos");
+        categoryPage.clickCategory("mocasines");
+
+        categoryPage.selectCategoryFilter(
+                "color",
+                "azul claro"
+        );
+
+        categoryPage.selectItemByNumberInPage(1);
+
+        productPage.selectFirstSizePicker();
+
+        // Add product
+        productPage.addProductToBag(false);
+        productPage.clickBuyNow();
+        Assert.assertTrue(loginPage.isFormDisplayed(),"form is not being displayed when trying to add product to bag without an active session");
+    }
+
+    @Test(description = "Flujo agregar a bolsa producto que requiere mas detalles",groups = {"negative","regression"},
+            testName = "prueba negativa producto sin todos detalles mandatorios incluidos",dependsOnMethods = {"login"})
+    public void addProductWithOutMandatorySpecs() throws InterruptedException {
+
+        homePage.clickCategoriesButton();
+
+        Assert.assertTrue(
+                homePage.isCategoriesMenuPresent(),
+                "Categories menu is not displayed"
+        );
+
+        homePage.clickCategory("hombre");
+
+        Assert.assertEquals(
+                categoryPage.getRootLevelCategory(),
+                "Hombre",
+                "Root category is incorrect"
+        );
+
+        categoryPage.clickCategory("zapatos");
+        categoryPage.clickCategory("mocasines");
+
+        categoryPage.selectCategoryFilter(
+                "color",
+                "azul claro"
+        );
+
+        categoryPage.selectCategoryFilter(
+                "talla",
+                "22"
+        );
+
+        categoryPage.selectItemByNumberInPage(0);
+
+
+
+
+        // Add product
+        productPage.addProductToBag(false);
+
+
+
+
+
+        Assert.assertTrue(productPage.isErrorMessageDisplayed(),"Error message is not being displayed for product that requires additional details");
+    }
+
+
+    @Test(description = "Flujo agregar a bolsa producto que requiere mas detalles",groups = {"edge","regression"},
+            testName = "prueba negativa producto sin todos detalles mandatorios incluidos",dependsOnMethods = {"login"})
+    public void buyNowCurrentProductMantainsAfterRefresh() throws InterruptedException {
+
+        homePage.clickCategoriesButton();
+
+        Assert.assertTrue(
+                homePage.isCategoriesMenuPresent(),
+                "Categories menu is not displayed"
+        );
+
+        homePage.clickCategory("hombre");
+
+        Assert.assertEquals(
+                categoryPage.getRootLevelCategory(),
+                "Hombre",
+                "Root category is incorrect"
+        );
+
+        categoryPage.clickCategory("zapatos");
+        categoryPage.clickCategory("mocasines");
+
+        categoryPage.selectCategoryFilter(
+                "color",
+                "azul claro"
+        );
+
+        categoryPage.selectItemByNumberInPage(0);
+        // Add product
+        productPage.addProductToBag(true);
+
+        productPage.clickBuyNow();
+        double originalItemPrice = buyNowPage.getOriginalItemPrice();
+        int getCurrentProductQuantity = buyNowPage.getCurrentProductQuantity();
+        driver.navigate().refresh();
+
+        Assert.assertEquals(originalItemPrice, buyNowPage.getOriginalItemPrice(), "Product's price doesnt remain the same after refresh");
+        Assert.assertEquals(getCurrentProductQuantity, buyNowPage.getCurrentProductQuantity(), "Product's quantity doesnt remain  the same after refresh");
+
+    }
+
+
 
 
 }
