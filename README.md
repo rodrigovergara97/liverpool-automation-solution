@@ -89,47 +89,6 @@ El framework utiliza Page Object Model (POM) para separar las acciones de la apl
                     │   Liverpool Web     │
                     └─────────────────────┘
 
-📁 Estructura del proyecto
-liverpool-automation/
-│
-├── pom.xml
-├── testng.xml
-├── README.md
-│
-├── docs/
-│   ├── architecture.png
-│   └── screenshots/
-│       ├── liverpool-home.png
-│       ├── categories.png
-│       ├── product.png
-│       └── extent-report.png
-│
-├── src/
-│   ├── main/
-│   │   └── java/
-│   │       ├── pages/
-│   │       │   ├── BasePage.java
-│   │       │   ├── HomePage.java
-│   │       │   ├── LoginPage.java
-│   │       │   ├── CategoryPage.java
-│   │       │   ├── ProductPage.java
-│   │       │   └── BuyNowPage.java
-│   │       │
-│   │       ├── utils/
-│   │       │   ├── WebDriverUtil.java
-│   │       │   └── DriverManager.java
-│   │       │
-│   │       └── config/
-│   │           └── reporter.json
-│   │
-│   └── test/
-│       └── java/
-│           └── tests/
-│               ├── BaseTest.java
-│               └── ApiTest.java
-│
-└── target/
-    └── RegressionReport.html
 
 🧪 Casos de prueba
 
